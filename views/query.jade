@@ -18,21 +18,21 @@ button.btn.btn-primary.btn-xs.toggle-button(style="margin-top: 0.5em" data-toggl
         .form-group
           label The Players Included
           select.form-control(name="included_account_id", multiple, data-placeholder="Included: Any Player ID")#included_account_id
-            each entry in q.included_account_id || []
-              option(value=entry, selected=q.included_account_id && q.included_account_id.indexOf(entry)!==-1)=entry
+            each option in filter.includedPlayers || []
+              option(value=option.value, selected=option.selected)=option.label
         .form-group
           label The Players Excluded
           select.form-control(name="excluded_account_id", multiple, data-placeholder="Excluded: Any Player ID")#excluded_account_id
-            each entry in q.excluded_account_id || []
-              option(value=entry, selected=q.excluded_account_id && q.excluded_account_id.indexOf(entry)!==-1)=entry
-              
+            each option in filter.excludedPlayers || []
+              option(value=option.value, selected=option.selected)=option.label
+
       .col-md-3
         .form-group
           label Hero
           select.form-control(multiple name="hero_id" data-placeholder="Any Hero")#hero_id
             each entry in constants.heroes
               option(value=entry.id, selected=(q["hero_id"] && q["hero_id"][0]===entry.id))=entry.localized_name
-        .form-group  
+        .form-group
           label Faction
           select.form-control(multiple name="is_radiant" data-placeholder="Any Faction")#is_radiant
             option(value="1", selected=(q["is_radiant"] && q["is_radiant"][0]===1)) Radiant
@@ -45,9 +45,9 @@ button.btn.btn-primary.btn-xs.toggle-button(style="margin-top: 0.5em" data-toggl
         .form-group
           label Lane
           select.form-control(multiple name="lane_role" data-placeholder="Any Lane")#lane_role
-            each val, key in constants.lane_role		
+            each val, key in constants.lane_role
               option(value=key, selected=(q["lane_role"] && q["lane_role"][0]===Number(key)))=val
-              
+
       .col-md-3
         .form-group
           label Patch
