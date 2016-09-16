@@ -82,6 +82,37 @@ module.exports = function (db, redis, cassandra)
             }
             delete req.query.account_id;
             console.timeEnd("player " + req.params.account_id);
+
+            // Builds an option list for the included/excluded player filters.
+            var buildPlayerOptions = function(query_param) {
+                query_param = query_param || [];
+                // Keep track of options added (as peers) so they aren't added again.
+                var query_param_items_added = {};
+                var peers = player.teammate_list || [];
+                var options = peers.map(function(teammate) {
+                    var selected = false;
+                    if (query_param.indexOf(teammate.account_id) >= 0) {
+                        selected = true;
+                        query_param_items_added[teammate.account_id] = true;
+                    };
+                    return {
+                        value: teammate.account_id,
+                        label: teammate.personaname || teammate.name || teammate.account_id,
+                        selected: selected
+                    };
+                });
+                query_param.forEach(function(account_id) {
+                    if (!query_param_items_added[account_id]) {
+                        options.push({
+                            value: account_id,
+                            label: account_id,
+                            selected: true
+                        });
+                    }
+                });
+                return options;
+            };
+
             res.render("player/player_" + info,
             {
                 q: req.query,
@@ -93,7 +124,11 @@ module.exports = function (db, redis, cassandra)
                 histograms: player_fields.subkeys,
                 times: player_fields.times,
                 counts: player_fields.countCats,
-                title: (player.profile.personaname || player.profile.account_id)
+                title: (player.profile.personaname || player.profile.account_id),
+                filter: {
+                    includedPlayers: buildPlayerOptions(req.query.included_account_id),
+                    excludedPlayers: buildPlayerOptions(req.query.excluded_account_id)
+                }
             });
         });
     });
